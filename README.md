@@ -23,7 +23,7 @@
 
 ## Abstract
 <p align="center">
-  <img src="assets/Teaser.png" width="500"/>
+  <img src="assets/pipeline.png" width="1000"/>
 </p>
 
 <details>
