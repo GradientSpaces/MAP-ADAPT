@@ -22,7 +22,8 @@
 </p>
 
 ## Abstract
-<image src="assets/Teaser.png"/>
+<p align="center">
+  <img src="assets/Teaser.png" width="500"/>
 </p>
 
 <details>
