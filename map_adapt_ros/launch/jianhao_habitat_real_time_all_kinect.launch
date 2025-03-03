@@ -1,0 +1,45 @@
+<launch>
+  <arg name="voxel_size" default="0.04"/>
+
+  <node name="segmentation_2d_node" pkg="segmentations" type="lw_segmentation_kinect.py" output="screen">
+  </node>
+
+  <node name="orb_slam2_node" pkg="orb_slam2_ros" type="rgbd_ros" output="screen">
+    <param name="path_to_voc_file" value="/local/home/zheng/jianhao/SLAM/ORB_SLAM2/Vocabulary/ORBvoc.txt" />
+    <param name="path_to_setting_file" value="/local/home/zheng/catkin_ws/src/orb_slam2_ros/config/kinect_config.yaml" />
+    <param name="visualizeOrbSlam" value="false" />
+    <remap from="/traj_visualizer/image" to="/rgb/image_raw" />
+    <remap from="/traj_visualizer/depth" to="/depth_to_rgb/image_raw" />
+  </node>
+
+  <node name="voxblox_node" pkg="map_adapt_ros" type="adaptive_voxel_server" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="pointcloud" to="/segmentation_2D/pointcloud"/>
+    <param name="tsdf_voxel_size" value="$(arg voxel_size)" />
+    <param name="tsdf_voxels_per_side" value="16" />
+    <param name="voxel_carving_enabled" value="true" />
+    <param name="color_mode" value="color" />
+    <param name="use_tf_transforms" value="false" />
+    <param name="update_mesh_every_n_sec" value="0.1" />
+    <param name="min_time_between_msgs_sec" value="0.0" />
+    <param name="method" value="fast" />
+    <param name="use_const_weight" value="simple" />
+    <param name="allow_clear" value="false" />
+    <param name="verbose" value="true" />
+    <param name="min_ray_length_m" value="0.0" />
+    <param name="max_ray_length_m" value="8.0" />
+    <param name="voxel_carving_enabled" value="false" />
+    <param name="visualize_semantic" value="false" />
+    <param name="max_consecutive_ray_collisions" value="3" />
+    <param name="load_semantic_probability" value="true" />
+    <param name="adaptive_mapping" value="false" />
+    <param name="adaptive_ratio_small" value="4.0" />
+    <param name="intensity_colormap" value="nyu" />
+    <param name="intensity_max_value" value="40.0" />
+    <param name="semantic_update_method" value="weighted_max" /> <!--Support: max_pooling; weighted_max; bayesian; bayesian_constant-->
+    <rosparam param="small_semantic" >[4,9]</rosparam> <!--Note: label starts from 1!!!!!-->
+    <remap from="transform" to="/orb_slam2/tf_output" />
+    <rosparam file="$(find map_adapt_ros)/cfg/identity.yaml"/>
+    <param name="mesh_filename" value="$(find map_adapt_ros)/mesh_results/jianhao_habitat.ply" />
+  </node>
+
+</launch>

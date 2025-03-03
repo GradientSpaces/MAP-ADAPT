@@ -1,0 +1,66 @@
+<launch>
+  <arg name="voxel_size" default="0.08"/>
+  <arg name="pc_pub_rate" default="10"/>
+  <arg name="load_semantic_probability" default="false"/>
+  <arg name="load_geo_complexity" default="false"/>
+  <arg name="adaptive_mapping" default="false"/>
+  <arg name="collection_name" default="collection1" />
+  <arg name="use_gt_semantic" default="true" />
+  <arg name="truncation_distance" default="0.2" />
+  <arg name="output_dir" default="/media/jianhao/T7/MAP_ADAPT/exp/HSSD_test/"/>
+  <arg name="data_dir" default="/media/jianhao/T7/MAP_ADAPT/data/HSSD_test/$(arg collection_name)/"/>
+
+  <node name="voxblox_node" pkg="map_adapt_ros" type="adaptive_voxel_server" output="screen" args="-alsologtostderr" clear_params="true" required="true">
+    <remap from="pointcloud" to="/traj_visualizer/pcl_output"/>
+    <remap from="transform" to="/traj_visualizer/tf_output" />
+    <remap from="/commander" to="/traj_visualizer/commander" />
+    <param name="tsdf_voxel_size" value="$(arg voxel_size)" />
+    <param name="truncation_distance" value="$(arg truncation_distance)" />
+    <param name="tsdf_voxels_per_side" value="16" />
+    <param name="voxel_carving_enabled" value="false" />
+    <param name="color_mode" value="color" />
+    <param name="use_tf_transforms" value="false" />
+    <param name="update_mesh_every_n_sec" value="-2" />
+    <param name="min_time_between_msgs_sec" value="0.0" />
+    <param name="method" value="fast" />
+    <param name="use_const_weight" value="simple" />
+    <param name="allow_clear" value="false" />
+    <param name="verbose" value="true" />
+    <param name="min_ray_length_m" value="0.0" />
+    <param name="max_ray_length_m" value="10.0" />
+    <param name="visualize_semantic" value="false" />
+    <param name="max_consecutive_ray_collisions" value="3" />
+    <param name="load_semantic_probability" value="$(arg load_semantic_probability)" />
+    <param name="load_geo_complexity" value="$(arg load_geo_complexity)" />
+    <param name="adaptive_mapping" value="$(arg adaptive_mapping)" />
+    <param name="adaptive_ratio_small" value="8.0" />
+    <param name="adaptive_ratio_middle" value="2.0" />
+    <param name="fuse_semantic_for_subvoxel" value="true" />
+    <param name="intensity_colormap" value="nyu" />
+    <param name="intensity_max_value" value="40.0" />
+    <param name="semantic_update_method" value="bayesian" /> <!--Support: max_pooling; weighted_max; bayesian; bayesian_constant-->
+    <!--Note: bowl, chair, chest of drawers, couch, cushion, microwave, plate, shelves, shoes, toaster-->
+    <rosparam param="small_semantic" >[6, 7, 8, 9, 10, 14, 16, 18, 19, 24]</rosparam> 
+    <!--Note: background, bed, book, drinkware, laptop, picture, sink, toilet, trashcan-->
+    <rosparam param="large_semantic" >[1, 3, 4, 11, 13, 15, 20, 25, 26]</rosparam> 
+    <rosparam param="geo_thresholds" >[0.05,0.1]</rosparam> 
+    <rosparam file="$(find map_adapt_ros)/cfg/identity.yaml"/>
+    <param name="output_dir" value="$(arg output_dir)" />
+    <param name="scene_name" value="$(arg collection_name)" />
+    <param name="semantic_level_split_id" value="1" />
+  </node>
+
+  <node name="traj_visualizer" pkg="map_adapt_ros" type="pc_semantic_geo_pub" output="screen" args="-alsologtostderr" clear_params="true">
+    <remap from="/traj_visualizer/pub_pc_switch" to="/voxblox_node/command_to_pc_publisher"/>
+    <param name="root_dir" value="$(arg data_dir)" />
+    <param name="path_to_estimated_pose" value="est_pose.txt" />
+    <param name="rate" value="$(arg pc_pub_rate)" />
+    <param name="wait_time" value="3.0" />
+    <param name="fx" value="320.0" />
+    <param name="fy" value="240.0" />
+    <param name="cx" value="319.0" />
+    <param name="cy" value="239.0" />
+    <param name="use_gt" value="$(arg use_gt_semantic)" />
+  </node>
+
+</launch>
