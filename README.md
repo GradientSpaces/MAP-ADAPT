@@ -38,6 +38,10 @@ Creating 3D semantic reconstructions of environments is fundamental to many appl
 
 ## Installation
 
+The followings are instruction to install MAP-ADAPT in Ubuntu 20.04 + ROS Noetic.
+These should also work with (Ubuntu 18.04 + ROS Melodic) with minimum change.
+We plan to release a docker version for users with different OS.
+
 **Prerequisites**
 
 1. If not already done so, install [ROS](http://wiki.ros.org/ROS/Installation) (Desktop-Full is recommended).
